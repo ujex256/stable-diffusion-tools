@@ -1,0 +1,101 @@
+import questionary as que
+import pathlib
+import json
+import argparse
+from enum import Enum
+
+import utils
+
+
+class ModelType(Enum):
+    CHECKPOINT = "CheckPoint"
+    CKPT = "CheckPoint"
+    VAE = "VAE"
+    EMBEDDINGS = "Embeddings"
+    LORA = "LoRA"
+
+    @classmethod
+    def cast(cls, string: str):
+        TYPES = [cls.CHECKPOINT, cls.VAE, cls.EMBEDDINGS, cls.LORA]
+        TYPES_STR = list(map(lambda x: x.value.lower(), TYPES))
+        if string.lower() not in TYPES_STR:
+            return None
+        return TYPES[TYPES_STR.index(string.lower())]
+
+    def dir_name(self):
+        return "iaaa"
+
+
+class MainCLI:
+    def __init__(self, path) -> None:
+        self.config = CLIConfig()
+        self.parser = argparse.ArgumentParser("Stable Diffusion Tools")
+        self.actions_str = ["モデルのダウンロード", "アップデートの確認"]
+        self.actions = [utils.download_model]
+
+    def add_parser(self):
+        self.parser.add_argument("config-dir")
+
+    def ask_action(self):
+        selector = que.select("アクションを選択", choices=self.actions_str, use_shortcuts=True)
+        self.actions[self.actions_str.index(selector.ask())](selector)
+
+    def download_model(self):
+        CHOICES_STR = ["CheckPoint", "VAE", "Embeddings", "LoRA"]
+        dw_type = que.select("何をダウンロードしますか？", choices=CHOICES_STR, use_shortcuts=True).ask()
+        dw_type = ModelType.cast(dw_type)
+
+        que.select
+
+
+class CLIConfig:
+    def __init__(self, path):
+        self.config_dir = pathlib.Path(path)
+        self.json_path = self.config_dir / "config.json"
+        self.models_dir = self.config_dir / "models"
+
+        self._validate_exists()
+
+    def _validate_exists(self):
+        if not self.config_dir.exists():
+            raise FileNotFoundError("Config file does not exist.")
+        if not self.config_dir.is_dir():
+            raise ValueError("Selected path is not a directory.")
+        if not self.json_path.exists():
+            raise FileNotFoundError("config.json does not exist.")
+        if not self.models_dir.exists():
+            raise FileNotFoundError("Models directory is not found.")
+
+    @property
+    def config(self):
+        if hasattr(self, "config"):
+            return self._config
+
+        with self.json_path.open() as f:
+            self._config = json.load(f)
+        return self._config
+
+    @property
+    def model_list(self):
+        if hasattr(self, "models"):
+            return self._models
+        FILENAMES = ["CheckPoint.json", "Embeddings.json", "VAE.json", "LoRA.json"]
+        result_dict = {
+            ModelType.CHECKPOINT: None,
+            ModelType.EMBEDDINGS: None,
+            ModelType.VAE: None,
+            ModelType.LORA: None,
+        }
+
+        for i in FILENAMES:
+            with self.models_dir.joinpath(i).open() as f:
+                result_dict[ModelType.cast(i.replace(".json", ""))] = json.load(f)
+        self._models = result_dict
+        return self._models
+
+    def get_model_by_type(self, _type: ModelType):
+        if hasattr(self, "models"):
+            return self._models[_type]
+        return self.model_list[_type]
+
+
