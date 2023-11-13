@@ -34,19 +34,27 @@ class MainCLI:
     def __init__(self, config_dir: str | Path, first_time: bool = True) -> None:
         self.config = CLIConfig(config_dir)
         self.parser = argparse.ArgumentParser("Stable Diffusion Tools")
-        self.actions_str = ["モデルのダウンロード", "アップデートの確認"]
-        self.actions = [utils.download_model]
+        self.is_first_time = first_time
 
     def add_parser(self):
-        self.parser.add_argument("config-dir")
+        self.actparser = self.parser.add_subparsers(title="action", description="Do action", required=True)
 
-    def ask_action(self):
-        selector = que.select("アクションを選択", choices=self.actions_str, use_shortcuts=True)
-        self.actions[self.actions_str.index(selector.ask())](selector)
+        dw = self.actparser.add_parser("download", aliases=["dw", "dwm"], help="モデルをダウンロードします。")
+        dw.set_defaults(func=self.download_model)
+        self.actparser.add_parser("config")
+
+    def parse(self):
+        if self.is_first_time:
+            pass
+        args = self.parser.parse_args()
+        if hasattr(args, "func"):
+            args.func(args)
+        else:
+            self.parser.print_help()
 
     def download_model(self):
         CHOICES_STR = ["CheckPoint", "VAE", "Embeddings", "LoRA"]
-        dw_type = que.select("何をダウンロードしますか？", choices=CHOICES_STR, use_shortcuts=True).ask()
+        dw_type = que.select("ダウンロードするモデルのタイプ？", choices=CHOICES_STR, use_shortcuts=True).ask()
         dw_type = ModelType.cast(dw_type)
 
         que.select
