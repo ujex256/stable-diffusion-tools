@@ -37,6 +37,10 @@ class MainCLI:
         self.actions_str = ["モデルのダウンロード", "アップデートの確認"]
         self.actions = [utils.download_model]
 
+        self.is_first_time = first_time
+        if self.is_first_time:
+            self.fis()
+
     def add_parser(self):
         self.parser.add_argument("config-dir")
 
