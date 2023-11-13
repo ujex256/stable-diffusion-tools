@@ -36,10 +36,6 @@ class MainCLI:
         self.parser = argparse.ArgumentParser("Stable Diffusion Tools")
         self.is_first_time = first_time
 
-        self.is_first_time = first_time
-        if self.is_first_time:
-            self.fis()
-
     def add_parser(self):
         self.actparser = self.parser.add_subparsers(title="action", description="Do action", required=True)
 
