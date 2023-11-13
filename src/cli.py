@@ -33,7 +33,7 @@ class ModelType(Enum):
 
 class MainCLI:
     def __init__(self, config_dir: str | Path, first_time: bool = True) -> None:
-        self.config = CLIConfig(config_dir)
+        self._config = CLIConfig(config_dir)
         self.parser = argparse.ArgumentParser("Stable Diffusion Tools")
         self.is_first_time = first_time
         self.add_parser()
@@ -54,7 +54,7 @@ class MainCLI:
         else:
             self.parser.print_help()
 
-    def download_model(self):
+    def download_model(self, args):
         CHOICES_STR = ["CheckPoint", "VAE", "Embeddings", "LoRA"]
         dw_type = que.select("ダウンロードするモデルのタイプ？", choices=CHOICES_STR, use_shortcuts=True).ask()
         dw_type = ModelType.cast(dw_type)
@@ -85,7 +85,7 @@ class CLIConfig:
 
     @property
     def config(self):
-        if hasattr(self, "config"):
+        if hasattr(self, "_config"):
             return self._config
 
         with self.json_path.open() as f:
@@ -94,7 +94,7 @@ class CLIConfig:
 
     @property
     def model_list(self):
-        if hasattr(self, "models"):
+        if hasattr(self, "_models"):
             return self._models
         FILENAMES = ["CheckPoint.json", "Embeddings.json", "VAE.json", "LoRA.json"]
         result_dict = {
