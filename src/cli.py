@@ -9,6 +9,7 @@ import questionary as que
 import requests
 
 import utils
+import cli_validator as validators
 
 
 class ModelType(Enum):
@@ -35,6 +36,7 @@ class MainCLI:
         self.config = CLIConfig(config_dir)
         self.parser = argparse.ArgumentParser("Stable Diffusion Tools")
         self.is_first_time = first_time
+        self.add_parser()
 
     def add_parser(self):
         self.actparser = self.parser.add_subparsers(title="action", description="Do action", required=True)
@@ -125,35 +127,60 @@ def get_config_dir() -> Path:
     return p
 
 
+def get_diffusion_path() -> Path | None:
+    path = Path.cwd()
+    if path.name != "stable-diffusion-webui":
+        p = list(path.glob("stable-diffusion-webui"))
+        if not p:
+            return None
+        path = list(filter(lambda x: x.is_dir(), p))[0]
+    return path
+
+
 def initialize_configuration():
     path = get_config_dir()
-
+    created = False
     if not path.exists():
-        create_config_file(path)
-        return True
+        diff_p = get_diffusion_path()
+        if diff_p is None:
+            diff_p = que.path(
+                "Stable Diffusionのパスを入力してください。",
+                only_directories=True,
+                validate=validators.PathDirValidator
+            )
+        create_config_file(path, Path(diff_p.ask()))
+        created = True
     try:
-        config = CLIConfig(path)
+        CLIConfig(path)
+        return created
     except Exception:
         raise Exception("不正なConfig")
 
 
-def create_config_file(path: Path):
-    if not path.exists():
-        path.mkdir()
-    config_json = path.joinpath("config.json")
+def create_config_file(config_dir: Path, diffusion_path: Path):
+    if not config_dir.exists():
+        config_dir.mkdir()
+    config_json = config_dir.joinpath("config.json")
+    TEMPLATE_JSON = {
+        "diffusion_path": str(diffusion_path.absolute())
+    }
     config_json.touch()
-    config_json.write_text("", encoding="utf-8")
+    config_json.write_text(json.dumps(TEMPLATE_JSON, indent=4), encoding="utf-8")
 
-    models_dir = path.joinpath("models")
+    models_dir = config_dir.joinpath("models")
     models_dir.mkdir()
     FILENAMES = ["CheckPoint.json", "Embeddings.json", "VAE.json", "LoRA.json"]
     for i in FILENAMES:
         p = models_dir.joinpath(i)
         p.touch()
-        BASE_URL = "https://example.com/"
-        data = requests.get(BASE_URL + i)
-        p.write_text(data, encoding="utf-8")
+        # TODO: build api server?
+        # BASE_URL = "https://example.com/"
+        # data = requests.get(BASE_URL + i)
+        data = requests.get("https://dummyjson.com/quotes/100")
+        p.write_text(json.dumps(data.json(), indent=4), encoding="utf-8")
 
 
 if __name__ == "__main__":
-    pass
+    initialize_configuration()
+    cli = MainCLI(get_config_dir(), True)
+    cli.parse()
