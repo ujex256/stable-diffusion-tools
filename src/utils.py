@@ -51,8 +51,6 @@ VAE = {}
 LORA = {}
 
 
-
-
 def download_model(url, path, sha256: str | None = None):
     file_size = int(requests.head(url, allow_redirects=True).headers["Content-Length"])
 
@@ -72,6 +70,7 @@ def download_model(url, path, sha256: str | None = None):
     if isinstance(sha256, str) and sha256 != hash:
         raise Exception("ハッシュが違う")
 
+
 if __name__ == "__main__":
     by = BytesIO()
     ta = MODELS["Counterfeit-V2.5"]["dw_url"]["fp16"]
@@ -87,6 +86,6 @@ if __name__ == "__main__":
         if not path.exists():
             raise FileNotFoundError(f"The directory {path.absolute()} does not exist.")
         if not path.is_dir():
-            raise Exception(f"Inputted path \"{path.absolute()}\" is not directory.")
+            raise Exception(f'Inputted path "{path.absolute()}" is not directory.')
 
     print(path.absolute())

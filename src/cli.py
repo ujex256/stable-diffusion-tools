@@ -1,8 +1,12 @@
-import questionary as que
-import pathlib
 import json
 import argparse
+import platform
+from pathlib import Path
+from os.path import expanduser
 from enum import Enum
+
+import questionary as que
+import requests
 
 import utils
 
@@ -27,8 +31,8 @@ class ModelType(Enum):
 
 
 class MainCLI:
-    def __init__(self, path) -> None:
-        self.config = CLIConfig()
+    def __init__(self, config_dir: str | Path, first_time: bool = True) -> None:
+        self.config = CLIConfig(config_dir)
         self.parser = argparse.ArgumentParser("Stable Diffusion Tools")
         self.actions_str = ["モデルのダウンロード", "アップデートの確認"]
         self.actions = [utils.download_model]
@@ -50,7 +54,10 @@ class MainCLI:
 
 class CLIConfig:
     def __init__(self, path):
-        self.config_dir = pathlib.Path(path)
+        if isinstance(path, str):
+            self.config_dir = Path(path)
+        else:
+            self.config_dir = path
         self.json_path = self.config_dir / "config.json"
         self.models_dir = self.config_dir / "models"
 
@@ -99,3 +106,46 @@ class CLIConfig:
         return self.model_list[_type]
 
 
+def get_config_dir() -> Path:
+    p = Path(expanduser("~"))
+    if (pl := platform.system()) == "Windows":
+        p = p.joinpath(r"AppData\Local\StableDiffusionTools")
+    elif pl == "Darwin":  # MacOS
+        p = p.joinpath("Library/Preferences")
+    else:
+        p = p.joinpath(".config/StableDiffusionTools")
+    return p
+
+
+def initialize_configuration():
+    path = get_config_dir()
+
+    if not path.exists():
+        create_config_file(path)
+        return True
+    try:
+        config = CLIConfig(path)
+    except Exception:
+        raise Exception("不正なConfig")
+
+
+def create_config_file(path: Path):
+    if not path.exists():
+        path.mkdir()
+    config_json = path.joinpath("config.json")
+    config_json.touch()
+    config_json.write_text("", encoding="utf-8")
+
+    models_dir = path.joinpath("models")
+    models_dir.mkdir()
+    FILENAMES = ["CheckPoint.json", "Embeddings.json", "VAE.json", "LoRA.json"]
+    for i in FILENAMES:
+        p = models_dir.joinpath(i)
+        p.touch()
+        BASE_URL = "https://example.com/"
+        data = requests.get(BASE_URL + i)
+        p.write_text(data, encoding="utf-8")
+
+
+if __name__ == "__main__":
+    pass
