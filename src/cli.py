@@ -9,6 +9,7 @@ import questionary as que
 import requests
 
 import utils
+import exceptions as exc
 import cli_validator as validators
 
 
@@ -43,7 +44,6 @@ class MainCLI:
 
         dw = self.actparser.add_parser("download", aliases=["dw", "dwm"], help="モデルをダウンロードします。")
         dw.set_defaults(func=self.download_model)
-        self.actparser.add_parser("config")
 
     def parse(self):
         if self.is_first_time:
@@ -154,7 +154,7 @@ def initialize_configuration():
         CLIConfig(path)
         return created
     except Exception:
-        raise Exception("不正なConfig")
+        raise exc.InvalidConfig(path, "Invalid config file. Please reset your configuration.")
 
 
 def create_config_file(config_dir: Path, diffusion_path: Path):
@@ -177,6 +177,8 @@ def create_config_file(config_dir: Path, diffusion_path: Path):
         # BASE_URL = "https://example.com/"
         # data = requests.get(BASE_URL + i)
         data = requests.get("https://dummyjson.com/quotes/100")
+        if not data.ok:
+            raise exc.ResourceGetFailed(f"Request Failed. Please try again. (url: {data.url} )")
         p.write_text(json.dumps(data.json(), indent=4), encoding="utf-8")
 
 
