@@ -1,9 +1,12 @@
 import json
 import argparse
 import platform
+import shutil
+import sys
 from pathlib import Path
 from os.path import expanduser
 from enum import Enum
+from pprint import pprint
 
 import questionary as que
 import requests
@@ -44,6 +47,8 @@ class MainCLI:
 
         dw = self.actparser.add_parser("download", aliases=["dw", "dwm"], help="モデルをダウンロードします。")
         dw.set_defaults(func=self.download_model)
+        confp = self.actparser.add_parser("config")
+        confp.set_defaults(func=self.print_config)
 
     def parse(self):
         if self.is_first_time:
@@ -60,6 +65,9 @@ class MainCLI:
         dw_type = ModelType.cast(dw_type)
 
         que.select
+
+    def print_config(self, args):
+        pprint(self._config.config)
 
 
 class CLIConfig:
@@ -127,6 +135,10 @@ def get_config_dir() -> Path:
     return p
 
 
+def reset_config(path: Path) -> None:
+    shutil.rmtree(str(path.absolute()) if isinstance(path, Path) else path)
+
+
 def get_diffusion_path() -> Path | None:
     path = Path.cwd()
     if path.name != "stable-diffusion-webui":
@@ -140,6 +152,11 @@ def get_diffusion_path() -> Path | None:
 def initialize_configuration():
     path = get_config_dir()
     created = False
+
+    if sys.argv[1:3] == ["config", "--reset"]:
+        reset_config(path)
+        print("Delete Completed.")
+        sys.exit(0)
     if not path.exists():
         diff_p = get_diffusion_path()
         if diff_p is None:
