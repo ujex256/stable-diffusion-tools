@@ -121,7 +121,7 @@ def get_config_dir() -> Path:
     if (pl := platform.system()) == "Windows":
         p = p.joinpath(r"AppData\Local\StableDiffusionTools")
     elif pl == "Darwin":  # MacOS
-        p = p.joinpath("Library/Preferences")
+        p = p.joinpath("Library/Preferences/StableDiffusionTools")
     else:
         p = p.joinpath(".config/StableDiffusionTools")
     return p
