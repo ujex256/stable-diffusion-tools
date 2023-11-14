@@ -111,7 +111,7 @@ class CLIConfig:
         return self._models
 
     def get_model_by_type(self, _type: ModelType):
-        if hasattr(self, "models"):
+        if hasattr(self, "_models"):
             return self._models[_type]
         return self.model_list[_type]
 
