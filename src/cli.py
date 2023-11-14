@@ -4,6 +4,7 @@ import platform
 import shutil
 import sys
 from pathlib import Path
+from os import sep as pathsep
 from os.path import expanduser
 from enum import Enum
 from pprint import pprint
@@ -31,8 +32,25 @@ class ModelType(Enum):
             return None
         return TYPES[TYPES_STR.index(string.lower())]
 
-    def dir_name(self):
-        return "iaaa"
+    def dir_name(self, diffusion_path: str | Path | None = None):
+        this = self.__class__
+        DIRS = {
+            this.CHECKPOINT: "/models/Stable-diffusion",
+            this.CKPT: "/models/Stable-diffusion",
+            this.VAE: "/models/VAE",
+            this.EMBEDDINGS: "/embeddings",
+            this.LORA: "/models/Lora"
+        }
+        if diffusion_path:
+            if isinstance(diffusion_path, Path):
+                return diffusion_path.joinpath(DIRS[self])
+            elif isinstance(diffusion_path, str):
+                rep_d = diffusion_path.replace("/", pathsep).rstrip(pathsep)
+                return rep_d + DIRS[self].replace("/", pathsep)
+        return DIRS[self]
+
+    def __repr__(self) -> str:
+        return super().__str__()
 
 
 class MainCLI:
