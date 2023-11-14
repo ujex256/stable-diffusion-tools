@@ -25,14 +25,14 @@ class ModelType(Enum):
     LORA = "LoRA"
 
     @classmethod
-    def cast(cls, string: str):
+    def cast(cls, string: str) -> "ModelType":
         TYPES = [cls.CHECKPOINT, cls.VAE, cls.EMBEDDINGS, cls.LORA]
         TYPES_STR = list(map(lambda x: x.value.lower(), TYPES))
         if string.lower() not in TYPES_STR:
             return None
         return TYPES[TYPES_STR.index(string.lower())]
 
-    def dir_name(self, diffusion_path: str | Path | None = None):
+    def dir_name(self, diffusion_path: str | Path | None = None) -> Path | str:
         this = self.__class__
         DIRS = {
             this.CHECKPOINT: "/models/Stable-diffusion",
@@ -60,7 +60,7 @@ class MainCLI:
         self.is_first_time = first_time
         self.add_parser()
 
-    def add_parser(self):
+    def add_parser(self) -> None:
         self.actparser = self.parser.add_subparsers(title="action", description="Do action", required=True)
 
         dw = self.actparser.add_parser("download", aliases=["dw", "dwm"], help="モデルをダウンロードします。")
@@ -68,7 +68,7 @@ class MainCLI:
         confp = self.actparser.add_parser("config")
         confp.set_defaults(func=self.print_config)
 
-    def parse(self):
+    def parse(self) -> None:
         if self.is_first_time:
             pass
         args = self.parser.parse_args()
@@ -84,12 +84,12 @@ class MainCLI:
 
         que.select
 
-    def print_config(self, args):
+    def print_config(self, args) -> None:
         pprint(self._config.config)
 
 
 class CLIConfig:
-    def __init__(self, path):
+    def __init__(self, path) -> None:
         if isinstance(path, str):
             self.config_dir = Path(path)
         else:
@@ -99,7 +99,7 @@ class CLIConfig:
 
         self._validate_exists()
 
-    def _validate_exists(self):
+    def _validate_exists(self) -> bool:
         if not self.config_dir.exists():
             raise FileNotFoundError("Config file does not exist.")
         if not self.config_dir.is_dir():
@@ -110,7 +110,7 @@ class CLIConfig:
             raise FileNotFoundError("Models directory is not found.")
 
     @property
-    def config(self):
+    def config(self) -> dict:
         if hasattr(self, "_config"):
             return self._config
 
@@ -119,7 +119,7 @@ class CLIConfig:
         return self._config
 
     @property
-    def model_list(self):
+    def model_list(self) -> dict:
         if hasattr(self, "_models"):
             return self._models
         FILENAMES = ["CheckPoint.json", "Embeddings.json", "VAE.json", "LoRA.json"]
@@ -136,7 +136,7 @@ class CLIConfig:
         self._models = result_dict
         return self._models
 
-    def get_model_by_type(self, _type: ModelType):
+    def get_model_by_type(self, _type: ModelType) -> dict:
         if hasattr(self, "_models"):
             return self._models[_type]
         return self.model_list[_type]
@@ -153,7 +153,7 @@ def get_config_dir() -> Path:
     return p
 
 
-def reset_config(path: Path) -> None:
+def reset_config(path: Path | str) -> None:
     shutil.rmtree(str(path.absolute()) if isinstance(path, Path) else path)
 
 
@@ -167,7 +167,7 @@ def get_diffusion_path() -> Path | None:
     return path
 
 
-def initialize_configuration():
+def initialize_configuration() -> bool:
     path = get_config_dir()
     created = False
 
@@ -192,7 +192,7 @@ def initialize_configuration():
         raise exc.InvalidConfig(path, "Invalid config file. Please reset your configuration.")
 
 
-def create_config_file(config_dir: Path, diffusion_path: Path):
+def create_config_file(config_dir: Path, diffusion_path: Path) -> None:
     if not config_dir.exists():
         config_dir.mkdir()
     config_json = config_dir.joinpath("config.json")
