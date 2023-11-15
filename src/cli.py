@@ -190,6 +190,12 @@ def initialize_configuration() -> bool:
         sys.exit(0)
     if not path.exists():
         diff_p = get_diffusion_path()
+        if diff_p:
+            a = que.confirm(
+                f"Stable Diffusionのパスを検出しました！これでよろしいですか？\n{diff_p.absolute()}"
+            )
+            if not a.ask():
+                diff_p = None
         if diff_p is None:
             diff_p = que.path(
                 "Stable Diffusionのパスを入力してください。",
