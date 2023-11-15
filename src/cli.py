@@ -82,7 +82,16 @@ class MainCLI:
         dw_type = que.select("ダウンロードするモデルのタイプ？", choices=CHOICES_STR, use_shortcuts=True).ask()
         dw_type = ModelType.cast(dw_type)
 
-        que.select
+        models = self._config.get_model_by_type(dw_type)
+        name = que.select("モデルの名前を選択してください", choices=models.keys()).ask()
+
+        weights = dict(filter(lambda x: bool(x[1]), models[name]["dw_url"].items()))  # not null
+        select_text = map(lambda x: f"{x[0]}({x[1].get('size', 'Unknown file size')})", weights.items())
+        selected_weight = que.select("サイズを選択してください。", choices=list(select_text)).ask()
+
+        sd: dict = weights[utils.remove_filesize_string(selected_weight)]
+        target_dir = Path(dw_type.dir_name(self._config.sd_path))
+        utils.download_model(sd["url"], target_dir, sd.get("sha256"))
 
     def print_config(self, args) -> None:
         pprint(self._config.config)
@@ -140,6 +149,10 @@ class CLIConfig:
         if hasattr(self, "_models"):
             return self._models[_type]
         return self.model_list[_type]
+
+    @property
+    def sd_path(self):
+        return self.config["diffusion_path"]
 
 
 def get_config_dir() -> Path:
