@@ -227,10 +227,9 @@ def create_config_file(config_dir: Path, diffusion_path: Path) -> None:
     for i in FILENAMES:
         p = models_dir.joinpath(i)
         p.touch()
-        # TODO: build api server?
-        # BASE_URL = "https://example.com/"
-        # data = requests.get(BASE_URL + i)
-        data = requests.get("https://dummyjson.com/quotes/100")
+
+        BASE_URL = "https://modelsjson-1-t1657038.deta.app/json/"
+        data = requests.get(BASE_URL + i)
         if not data.ok:
             raise exc.ResourceGetFailed(f"Request Failed. Please try again. (url: {data.url} )")
         p.write_text(json.dumps(data.json(), indent=4), encoding="utf-8")
