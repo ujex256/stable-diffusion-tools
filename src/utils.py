@@ -55,23 +55,3 @@ def generate_size_str(url: str) -> str:
     i = math.floor(math.log(byte_count, 1024)) if byte_count > 0 else 0
     byte_count = round(byte_count / 1024 ** i, 2)
     return f"{byte_count} {units[i]}"
-
-
-if __name__ == "__main__":
-    by = BytesIO()
-    ta = MODELS["Counterfeit-V2.5"]["dw_url"]["fp16"]
-    aaa = download_model(ta["url"], by, sha256=ta["sha256"])
-
-    path = Path.cwd()
-    if p := list(path.glob("stable-diffusion-webui")):
-        path = list(filter(lambda x: x.is_dir(), p))[0]
-    elif path.name == "stable-diffusion-webui":
-        pass
-    else:
-        path = Path(input())
-        if not path.exists():
-            raise FileNotFoundError(f"The directory {path.absolute()} does not exist.")
-        if not path.is_dir():
-            raise Exception(f'Inputted path "{path.absolute()}" is not directory.')
-
-    print(path.absolute())
