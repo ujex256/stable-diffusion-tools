@@ -17,6 +17,7 @@ import exceptions as exc
 import cli_validator as validators
 
 
+# TODO: Config類を分ける
 class ModelType(Enum):
     CHECKPOINT = "CheckPoint"
     CKPT = "CheckPoint"
