@@ -66,6 +66,7 @@ class MainCLI:
         dw = self.actparser.add_parser("download", aliases=["dw", "dwm"], help="モデルをダウンロードします。")
         dw.set_defaults(func=self.download_model)
         confp = self.actparser.add_parser("config")
+        confp.add_argument("--reset", help="Configをリセットします。")  # dummy arg
         confp.set_defaults(func=self.print_config)
 
     def parse(self) -> None:
