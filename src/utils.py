@@ -1,6 +1,7 @@
 import hashlib
 import pathlib
 import re
+import math
 from io import BytesIO
 from pathlib import Path
 import requests
@@ -42,7 +43,18 @@ def extract_file_name(r: requests.Response):
 
 
 def remove_filesize_string(string: str) -> str:
-    return re.sub(r"\([^()]*\)$", "", string)
+    return re.sub(r"\([^()]*\)$", "", string).rstrip(" ")
+
+
+def generate_size_str(url: str) -> str:
+    resp_header = requests.head(url, allow_redirects=True)
+    byte_count = int(resp_header.headers["Content-Length"])
+
+    # from: https://pystyle.info/python-data-size-conversion/
+    units = ("B", "KB", "MB", "GB", "TB", "PB", "EB", "ZB")
+    i = math.floor(math.log(byte_count, 1024)) if byte_count > 0 else 0
+    byte_count = round(byte_count / 1024 ** i, 2)
+    return f"{byte_count} {units[i]}"
 
 
 if __name__ == "__main__":

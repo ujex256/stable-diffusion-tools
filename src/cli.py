@@ -85,8 +85,14 @@ class MainCLI:
         models = self._config.get_model_by_type(dw_type)
         name = que.select("モデルの名前を選択してください", choices=models.keys()).ask()
 
+        que.print("! ", style="ansiblue", end="")
+        que.print("ファイルサイズを取得中...", style="bold")
+        print()
         weights = dict(filter(lambda x: bool(x[1]), models[name]["dw_url"].items()))  # not null
-        select_text = map(lambda x: f"{x[0]}({x[1].get('size', 'Unknown file size')})", weights.items())
+        select_text = map(
+            lambda x: f"{x[0]} ({utils.generate_size_str(x[1]['url'])})",
+            weights.items()
+        )
         selected_weight = que.select("サイズを選択してください。", choices=list(select_text)).ask()
 
         sd: dict = weights[utils.remove_filesize_string(selected_weight)]
