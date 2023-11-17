@@ -24,7 +24,10 @@ def download_model(url: str, path: str | pathlib.Path | BytesIO, sha256: str | N
         raise ValueError("Arg \"path\" must be string or pathlib.Path or BytesIO.")
 
     with fe as f:
-        pbar = tqdm(total=file_size, unit="B", unit_scale=True, dynamic_ncols=True)
+        pbar = tqdm(
+            total=file_size, dynamic_ncols=True,
+            unit="B", unit_scale=True, unit_divisor=1024
+        )
         for chunk in requests.get(url, stream=True).iter_content(chunk_size=1024):
             f.write(chunk)
             pbar.update(len(chunk))
