@@ -50,8 +50,12 @@ def remove_filesize_string(string: str) -> str:
 
 
 def generate_size_str(url: str) -> str:
-    resp_header = requests.head(url, allow_redirects=True)
-    byte_count = int(resp_header.headers["Content-Length"])
+    if url.startswith("https://civitai.com"):
+        url = "https://civitai.com/api/v1/model-versions/" + url.split("/")[6].split("?")[0]
+        byte_count = round(float(requests.get(url).json()["files"][0]["sizeKB"]) * 1024)
+    else:
+        resp_header = requests.head(url, allow_redirects=True)
+        byte_count = int(resp_header.headers["Content-Length"])
 
     # from: https://pystyle.info/python-data-size-conversion/
     units = ("B", "KB", "MB", "GB", "TB", "PB", "EB", "ZB")
