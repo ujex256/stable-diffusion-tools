@@ -81,11 +81,11 @@ class MainCLI:
 
     def download_model(self, args):
         CHOICES_STR = ["CheckPoint", "VAE", "Embeddings", "LoRA"]
-        dw_type = que.select("ダウンロードするモデルを選択してください。", choices=CHOICES_STR, use_shortcuts=True).ask()
+        dw_type = que.select("ダウンロードするモデルの種類を選択してください。", choices=CHOICES_STR, use_shortcuts=True).ask()
         dw_type = ModelType.cast(dw_type)
 
         models = self._config.get_model_by_type(dw_type)
-        name = que.select("モデルの名前を選択してください。", choices=models.keys()).ask()
+        name = que.select("モデルを選択してください。", choices=models.keys()).ask()
 
         que.print("! ", style="ansiblue", end="")
         que.print("ファイルサイズを取得中...", style="bold")
@@ -95,7 +95,7 @@ class MainCLI:
             lambda x: f"{x[0]} ({utils.generate_size_str(x[1]['url'])})",
             weights.items()
         )
-        selected_weight = que.select("モデルのを選択してください。", choices=list(select_text)).ask()
+        selected_weight = que.select("モデルのサイズを選択してください。", choices=list(select_text)).ask()
 
         sd: dict = weights[utils.remove_filesize_string(selected_weight)]
         target_dir = Path(dw_type.dir_name(self._config.sd_path))
