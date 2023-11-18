@@ -175,7 +175,7 @@ def get_config_dir() -> Path:
 
 
 def reset_config(path: Path | str) -> None:
-    shutil.rmtree(str(path.absolute()) if isinstance(path, Path) else path)
+    shutil.rmtree(str(path.resolve()) if isinstance(path, Path) else path)
 
 
 def get_diffusion_path() -> Path | None:
@@ -224,7 +224,7 @@ def create_config_file(config_dir: Path, diffusion_path: Path) -> None:
         config_dir.mkdir()
     config_json = config_dir.joinpath("config.json")
     TEMPLATE_JSON = {
-        "diffusion_path": str(diffusion_path.absolute())
+        "diffusion_path": str(diffusion_path.resolve())
     }
     config_json.touch()
     config_json.write_text(json.dumps(TEMPLATE_JSON, indent=4), encoding="utf-8")
