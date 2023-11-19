@@ -14,7 +14,7 @@ class SDImage:
 
         self.time = FileTime(self.img_path)
 
-    def print_exif(self):
+    def print_info(self):
         pprint(self.to_dict(), sort_dicts=False)
 
     def to_dict(self, lower_key: bool = False):
@@ -75,5 +75,5 @@ class FileTime:
 
 if __name__ == "__main__":
     s = SDImage("../sample.png")
-    s.print_exif()
+    s.print_info()
     print(s.time.ctime)
