@@ -15,7 +15,7 @@ class SDImage:
         self.time = FileTime(self.img_path)
 
     def print_exif(self):
-        pprint(self.description["parameters"].split("\n"))
+        pprint(self.to_dict(), sort_dicts=False)
 
     def to_dict(self, lower_key: bool = False):
         if hasattr(self, "_d"):
@@ -75,5 +75,5 @@ class FileTime:
 
 if __name__ == "__main__":
     s = SDImage("../sample.png")
-    pprint(s.to_dict(), sort_dicts=False)
+    s.print_exif()
     print(s.time.ctime)
