@@ -13,6 +13,7 @@ import questionary as que
 import requests
 
 import utils
+import sd_image
 import exceptions as exc
 import cli_validator as validators
 
@@ -66,9 +67,15 @@ class MainCLI:
 
         dw = self.actparser.add_parser("download", aliases=["dw", "dwm"], help="モデルをダウンロードします。")
         dw.set_defaults(func=self.download_model)
+
         confp = self.actparser.add_parser("config")
         confp.add_argument("--reset", help="Configをリセットします。")  # dummy arg
         confp.set_defaults(func=self.print_config)
+
+        iinfo = self.actparser.add_parser("img-info")
+        iinfo.add_argument("filename", nargs="?", default=None, type=Path)
+        iinfo.add_argument("--all-show", "--verbose", action="store_true")
+        iinfo.set_defaults(func=self.show_img_info)
 
     def parse(self) -> None:
         if self.is_first_time:
@@ -100,6 +107,17 @@ class MainCLI:
         sd: dict = weights[utils.remove_filesize_string(selected_weight)]
         target_dir = Path(dw_type.dir_name(self._config.sd_path))
         utils.download_model(sd["url"], target_dir, sd.get("sha256"))
+
+    def show_img_info(self, args):
+        if not args.filename:
+            imgp = Path(que.path("画像のパスを入力してください>> ", validate=validators.ExistsValidator).ask())
+        if not imgp.exists():
+            raise FileNotFoundError(f"指定されたファイル {imgp}がありません。")
+        meta = sd_image.SDImage(imgp)
+        show_attrs = ["Prompt", "Negative_prompt", "Sampler", "Seed", "Size", "Model", "VAE"]
+        for i in meta.to_dict().items():
+            if i[0] in show_attrs or args.all_show:
+                print(f"{i[0]}: {i[1]}")
 
     def print_config(self, args) -> None:
         pprint(self._config.config)
