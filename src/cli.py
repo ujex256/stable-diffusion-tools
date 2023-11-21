@@ -47,7 +47,7 @@ class ModelType(Enum):
             if isinstance(diffusion_path, Path):
                 return diffusion_path.joinpath(DIRS[self])
             elif isinstance(diffusion_path, str):
-                rep_d = diffusion_path.replace("/", pathsep).replace("\\", "").rstrip(pathsep)
+                rep_d = diffusion_path.replace("/", pathsep).replace("\\", pathsep).rstrip(pathsep)
                 return rep_d + DIRS[self].replace("/", pathsep)
         return DIRS[self]
 
