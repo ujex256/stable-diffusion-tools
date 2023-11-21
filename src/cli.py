@@ -93,6 +93,11 @@ class MainCLI:
 
         models = self._config.get_model_by_type(dw_type)
         name = que.select("モデルを選択してください。", choices=models.keys()).ask()
+        if dw_type is not ModelType.CHECKPOINT:
+            target_dir = Path(dw_type.dir_name(self._config.sd_path))
+            sha256 = models[name].get("sha256")
+            utils.download_model(models[name]["dw_url"], target_dir, sha256)
+            return
 
         que.print("! ", style="ansiblue", end="")
         que.print("ファイルサイズを取得中...", style="bold")
