@@ -1,7 +1,6 @@
 from PIL import Image
 
-from datetime import datetime as dt  # バキバキ
-from dataclasses import dataclass
+from datetime import datetime as dt
 from pathlib import Path
 from pprint import pprint
 
