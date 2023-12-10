@@ -125,11 +125,11 @@ class CLIConfig:
 def get_config_dir() -> Path:
     p = Path.home()
     if (pl := platform.system()) == "Windows":
-        p = p.joinpath(r"AppData\Local\StableDiffusionTools")
+        p = p.joinpath(r"AppData\Roaming\sdtools")
     elif pl == "Darwin":  # MacOS
-        p = p.joinpath("Library/Preferences/StableDiffusionTools")
+        p = p.joinpath("Library/Preferences/sdtools")
     else:
-        p = p.joinpath(".config/StableDiffusionTools")
+        p = p.joinpath(".config/sdtools")
     return p
 
 
