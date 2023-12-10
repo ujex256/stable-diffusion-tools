@@ -9,7 +9,7 @@ from pathlib import Path
 import questionary as que
 import requests
 
-import cli_validator as validators
+import cli_validator as val
 import exceptions as exc
 
 
@@ -152,7 +152,7 @@ def initialize_configuration() -> bool:
             diff_p = que.path(
                 "Stable Diffusionのパスを入力してください。",
                 only_directories=True,
-                validate=validators.PathDirValidator
+                validate=val.PathDirValidator
             )
         create_config_file(path, Path(diff_p.ask()))
         created = True

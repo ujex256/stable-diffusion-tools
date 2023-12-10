@@ -4,17 +4,16 @@ from pprint import pprint
 
 import questionary as que
 
-import cli_validator as validators
+import cli_validator as val
 import sd_image
 import utils
 from config import CLIConfig, ModelType, get_config_dir, initialize_configuration
 
 
 class MainCLI:
-    def __init__(self, config_dir: str | Path, first_time: bool = True) -> None:
+    def __init__(self, config_dir: str | Path) -> None:
         self._config = CLIConfig(config_dir)
         self.parser = argparse.ArgumentParser("Stable Diffusion Tools")
-        self.is_first_time = first_time
         self.add_parser()
 
     def add_parser(self) -> None:
@@ -33,8 +32,6 @@ class MainCLI:
         iinfo.set_defaults(func=self.show_img_info)
 
     def parse(self) -> None:
-        if self.is_first_time:
-            pass
         args = self.parser.parse_args()
         if hasattr(args, "func"):
             args.func(args)
@@ -42,12 +39,13 @@ class MainCLI:
             self.parser.print_help()
 
     def download_model(self, args):
-        CHOICES_STR = ["CheckPoint", "VAE", "Embeddings", "LoRA"]
-        dw_type = que.select("ダウンロードするモデルの種類を選択してください。", choices=CHOICES_STR, use_shortcuts=True).ask()
+        CHOICES = ["CheckPoint", "VAE", "Embeddings", "LoRA"]
+        dw_type = que.select("ダウンロードするモデルの種類を選択してください。", choices=CHOICES, use_shortcuts=True).ask()
         dw_type = ModelType.cast(dw_type)
 
         models = self._config.get_model_by_type(dw_type)
         name = que.select("モデルを選択してください。", choices=models.keys()).ask()
+        # モデル以外ならそのままダウンロード
         if dw_type is not ModelType.CHECKPOINT:
             target_dir = Path(dw_type.dir_name(self._config.sd_path))
             sha256 = models[name].get("sha256")
@@ -70,10 +68,10 @@ class MainCLI:
 
     def show_img_info(self, args):
         if not args.filename:
-            imgp = Path(que.path("画像のパスを入力してください>> ", validate=validators.ExistsValidator).ask())
-        if not imgp.exists():
-            raise FileNotFoundError(f"指定されたファイル {imgp}がありません。")
-        meta = sd_image.SDImage(imgp)
+            img = Path(que.path("画像のパスを入力してください>> ", validate=val.ExistsValidator).ask())
+        if not img.exists():
+            raise FileNotFoundError(f"指定されたファイル {img}がありません。")
+        meta = sd_image.SDImage(img)
         show_attrs = ["Prompt", "Negative_prompt", "Sampler", "Seed", "Size", "Model", "VAE"]
         for i in meta.to_dict().items():
             if i[0] in show_attrs or args.all_show:
