@@ -29,6 +29,14 @@ class ModelType(Enum):
         return TYPES[TYPES_STR.index(string.lower())]
 
     def dir_name(self, diffusion_path: str | Path | None = None) -> Path | str:
+        """そのモデルをどこに配置するか返します
+
+        Args:
+            diffusion_path (str | Path | None, optional): webuiがあるディレクトリのPath
+
+        Returns:
+            Path | str: 入力された型で返します。Noneの場合はstrです
+        """
         DIRS = {
             self.CHECKPOINT: "/models/Stable-diffusion",
             self.CKPT: "/models/Stable-diffusion",
@@ -97,6 +105,14 @@ class CLIConfig:
         return self._models
 
     def get_model_by_type(self, _type: ModelType) -> dict:
+        """入力されたタイプのモデル一覧を返します
+
+        Args:
+            _type (ModelType): モデルのタイプ
+
+        Returns:
+            dict: モデル一覧
+        """
         if hasattr(self, "_models"):
             return self._models[_type]
         return self.model_list[_type]
