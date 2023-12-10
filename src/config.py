@@ -29,13 +29,12 @@ class ModelType(Enum):
         return TYPES[TYPES_STR.index(string.lower())]
 
     def dir_name(self, diffusion_path: str | Path | None = None) -> Path | str:
-        this = self.__class__
         DIRS = {
-            this.CHECKPOINT: "/models/Stable-diffusion",
-            this.CKPT: "/models/Stable-diffusion",
-            this.VAE: "/models/VAE",
-            this.EMBEDDINGS: "/embeddings",
-            this.LORA: "/models/Lora"
+            self.CHECKPOINT: "/models/Stable-diffusion",
+            self.CKPT: "/models/Stable-diffusion",
+            self.VAE: "/models/VAE",
+            self.EMBEDDINGS: "/embeddings",
+            self.LORA: "/models/Lora"
         }
         if diffusion_path:
             if isinstance(diffusion_path, Path):
