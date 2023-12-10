@@ -82,9 +82,9 @@ class MainCLI:
 
 
 if __name__ == "__main__":
-    initialize_configuration()
-    cli = MainCLI(get_config_dir())
     try:
+        initialize_configuration()
+        cli = MainCLI(get_config_dir())
         cli.parse()
     except KeyboardInterrupt:
         print("\nCancelled by user.")
