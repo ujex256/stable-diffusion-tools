@@ -20,15 +20,15 @@ def download_model(url: str, path: str | pathlib.Path | BytesIO, sha256: str | N
     print(file_name)
 
     if isinstance(path, str):
-        fe = pathlib.Path(path).joinpath(file_name).open("wb")
+        f = pathlib.Path(path).joinpath(file_name).open("wb")
     elif isinstance(path, Path):
-        fe = path.joinpath(file_name).open("wb")
+        f = path.joinpath(file_name).open("wb")
     elif isinstance(BytesIO, path):
-        fe = path
+        f = path
     else:
         raise ValueError("Arg \"path\" must be string or pathlib.Path or BytesIO.")
 
-    with fe as f:
+    with f:
         pbar = tqdm(
             total=file_size, dynamic_ncols=True,
             unit="B", unit_scale=True, unit_divisor=1024
