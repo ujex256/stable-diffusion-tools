@@ -22,14 +22,14 @@ class MainCLI:
         dw = self.actparser.add_parser("download", aliases=["dw", "dwm"], help="モデルをダウンロードします。")
         dw.set_defaults(func=self.download_model)
 
-        confp = self.actparser.add_parser("config")
-        confp.add_argument("--reset", help="Configをリセットします。")  # dummy arg
-        confp.set_defaults(func=self.print_config)
+        conf_p = self.actparser.add_parser("config")
+        conf_p.add_argument("--reset", help="Configをリセットします。")  # dummy arg
+        conf_p.set_defaults(func=self.print_config)
 
-        iinfo = self.actparser.add_parser("img-info")
-        iinfo.add_argument("filename", nargs="?", default=None, type=Path)
-        iinfo.add_argument("--all-show", "--verbose", action="store_true")
-        iinfo.set_defaults(func=self.show_img_info)
+        im_info = self.actparser.add_parser("img-info")
+        im_info.add_argument("filename", nargs="?", default=None, type=Path)
+        im_info.add_argument("--all-show", "--verbose", action="store_true")
+        im_info.set_defaults(func=self.show_img_info)
 
     def parse(self) -> None:
         args = self.parser.parse_args()
