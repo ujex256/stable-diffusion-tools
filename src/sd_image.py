@@ -22,7 +22,10 @@ class SDImage:
                 return dict(map(lambda x: (x[0].lower(), x[1]), self._d.items()))
             return self._d
 
-        info: list[str] = self.description["parameters"].split("\n")
+        try:
+            info: list[str] = self.description["parameters"].split("\n")
+        except KeyError:
+            return None
         result = dict()
         result["Prompt"] = info[0].rstrip(" ")
         result["Negative_prompt"] = info[1].strip("Negative prompt: ")
@@ -31,7 +34,7 @@ class SDImage:
         attrs = ["Steps", "Sampler", "CFG scale", "Seed", "Size", "Model hash", "Model", "VAE hash", "VAE", "Clip skip", "TI hashes", "Version"]  # NOQA
         for index, attr in enumerate(attrs):
             name = attr.replace(" ", "_")
-            elem = data[index].strip(attr + ": ")
+            elem = data[index].removeprefix(attr + ": ")
             try:
                 elem = float(elem)
                 if elem.is_integer():
