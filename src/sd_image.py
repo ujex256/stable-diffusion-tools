@@ -27,11 +27,11 @@ class SDImage:
         result["Prompt"] = info[0].rstrip(" ")
         result["Negative_prompt"] = info[1].strip("Negative prompt: ")
 
-        datas = info[2].split(", ")
-        attrs = ["Steps", "Sampler", "CFG scale", "Seed", "Size", "Model hash", "Model", "VAE hash", "VAE", "Clip skip", "TI hashes", "Version"]
+        data = info[2].split(", ")
+        attrs = ["Steps", "Sampler", "CFG scale", "Seed", "Size", "Model hash", "Model", "VAE hash", "VAE", "Clip skip", "TI hashes", "Version"]  # NOQA
         for index, attr in enumerate(attrs):
             name = attr.replace(" ", "_")
-            elem = datas[index].strip(attr + ": ")
+            elem = data[index].strip(attr + ": ")
             try:
                 elem = float(elem)
                 if elem.is_integer():
