@@ -75,10 +75,14 @@ class MainCLI:
         if not img.exists():
             raise FileNotFoundError(f"指定されたファイル {img}がありません。")
         meta = sd_image.SDImage(img)
+        if meta is None:
+            return "画像の解析に失敗しました。"
+
         show_attrs = ["Prompt", "Negative_prompt", "Sampler", "Seed", "Size", "Model", "VAE"]
         for i in meta.to_dict().items():
             if i[0] in show_attrs or args.all_show:
                 print(f"{i[0]}: {i[1]}")
+        print("Creation Date:", meta.time.ctime)
 
     def print_config(self, args) -> None:
         pprint(self._config.config)
