@@ -9,8 +9,8 @@ from pathlib import Path
 import questionary as que
 import requests
 
-import cli_validator as val
-import exceptions as exc
+from . import cli_validator as val
+from . import exceptions as exc
 
 
 class ModelType(Enum):

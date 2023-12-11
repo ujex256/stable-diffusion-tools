@@ -4,10 +4,10 @@ from pprint import pprint
 
 import questionary as que
 
-import cli_validator as val
-import sd_image
-import utils
-from config import CLIConfig, ModelType, get_config_dir, initialize_configuration
+from . import cli_validator as val
+from . import sd_image
+from . import utils
+from .config import CLIConfig, ModelType
 
 
 class MainCLI:
@@ -79,12 +79,3 @@ class MainCLI:
 
     def print_config(self, args) -> None:
         pprint(self._config.config)
-
-
-if __name__ == "__main__":
-    try:
-        initialize_configuration()
-        cli = MainCLI(get_config_dir())
-        cli.parse()
-    except KeyboardInterrupt:
-        print("\nCancelled by user.")
